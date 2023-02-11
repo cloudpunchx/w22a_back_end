@@ -58,6 +58,25 @@ def delete_candy():
     else:
         return make_response(jsonify(result), 500)
 
+# Clients can POST/create candy by giving a name and category
+@app.post('/api/candy')
+def post_candy():
+    """
+    Expects 2 Arguments:
+    candyName, category
+    """
+    required_data = ['candyName', 'category']
+    check_result = check_data(request.json, required_data)
+    if check_result != None:
+        return check_result
+    candy_name = request.json.get('candyName')
+    category = request.json.get('category')
+    result = run_statement("CALL post_candy(?,?)", [candy_name, category])
+    if (type(result) == list):
+        return make_response(jsonify(result), 200)
+    else:
+        return make_response(jsonify(result), 500)
+
 if (production_mode == True):
     print("Running server in Production Mode")
     import bjoern #type:ignore
