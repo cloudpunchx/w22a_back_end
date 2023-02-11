@@ -38,6 +38,25 @@ def patch_candy_name():
     else:
         return make_response(jsonify(result), 500)
 
+# Clients can DELETE candy by giving an ID and Name (I wanted them to use both to confirm delete)
+# circle back to fix, it completes delete and sends back the ELSE with 500 error, same with PATCH
+@app.delete('/api/candy')
+def delete_candy():
+    """
+    Expects 2 Arguments:
+    candyId, candyName
+    """
+    required_data = ['candyId', 'candyName']
+    check_result = check_data(request.json, required_data)
+    if check_result != None:
+        return check_result
+    candy_id = request.json.get('candyId')
+    candy_name = request.json.get('candyName')
+    result = run_statement("CALL delete_candy(?,?)", [candy_id, candy_name])
+    if (type(result) == list):
+        return make_response(jsonify(result), 200)
+    else:
+        return make_response(jsonify(result), 500)
 
 if (production_mode == True):
     print("Running server in Production Mode")
