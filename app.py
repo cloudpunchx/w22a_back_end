@@ -32,10 +32,13 @@ def patch_candy_name():
     candy_id = request.json.get('candyId')
     candy_name = request.json.get('candyName')
     result = run_statement("CALL patch_candy(?,?)", [candy_id, candy_name])
-    if result == None:
-        return make_response(jsonify(f"Successfully edited Candy: {candy_name}"), 200)
+    if (type(result) == list):
+        if result[0][0] == 1:
+            return make_response(jsonify(f"Successfully edited Candy: {candy_name}"), 200)
+        elif result[0][0] == 0:
+            return make_response(jsonify(f"Edit unsuccessful for Candy, please verify candy ID and name."), 400)
     else:
-        return make_response(jsonify(f"Edit unsuccessful for Candy, please verify candy ID and name."), 500)
+        "There has been an unexpected error."
 
 # Clients can DELETE candy by giving an ID and Name (I wanted them to use both to confirm delete)
 @app.delete('/api/candy')
@@ -51,10 +54,14 @@ def delete_candy():
     candy_id = request.json.get('candyId')
     candy_name = request.json.get('candyName')
     result = run_statement("CALL delete_candy(?,?)", [candy_id, candy_name])
-    if result[0][0] == 1:
-        return make_response(jsonify(f"Successfully deleted candy {candy_name}."), 200)
-    elif result[0][0] == 0:
-        return make_response(jsonify(f"Delete unsuccessful for candy {candy_name}, check candy ID and name."), 500)
+    if (type(result) == list):
+        if result[0][0] == 1:
+            return make_response(jsonify(f"Successfully deleted candy {candy_name}."), 200)
+        elif result[0][0] == 0:
+            return make_response(jsonify(f"Delete unsuccessful for candy {candy_name}, check candy ID and name."), 400)
+    else:
+        "There has been an unexpected error."
+
 
 # Clients can POST/create candy by giving a name and category
 @app.post('/api/candy')
